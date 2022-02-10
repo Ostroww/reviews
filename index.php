@@ -1,5 +1,15 @@
 <?php
 
+session_start();
+
+$user = $_SESSION['user'] ?? null;
+
+$logout = $_GET['logout'] ?? null;
+
+if ($logout) {
+    unset($_SESSION['user']);
+}
+
 $db = new PDO('mysql:host=localhost;port=3306;dbname=avis;charset=utf8', 'root', '');
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -141,9 +151,33 @@ if (!empty($_POST)) {
         table.list tr td{
             width: 800px;
         }
+        nav {
+            display: flex;
+            justify-content: space-between;
+        }
+        .login {
+            display: flex;
+            align-items: center;
+        }
+        .avatar {
+            border-radius: 25%;
+        }
     </style>
 </head>
 <body>
+    <nav>
+        <h1>Ch'ti Restaurant</h1>
+        <div class="login">
+            <?php if ($user) { ?>
+                <h5><?php echo $user ?></h5>
+                <a href="logout.php">
+                    <img src="img/avatar.png" alt="avatar" width="100" class="avatar">
+                </a>
+            <?php } else { ?>
+                <a href="login.php">Se connecter</a>
+            <?php } ?>
+        </div>
+    </nav>
     <div class="container">
         <table class="table">
             <tr>
@@ -244,7 +278,11 @@ if (!empty($_POST)) {
         
                     <form method="post" class="form-group" enctype="multipart/form-data">
                         <label for="nom">Nom</label>
-                        <input name="nom" type="text" placeholder="Votre nom" class="form-control">
+                        <?php if ($user) { ?>
+                            <input name="nom" type="text" placeholder="Votre nom" class="form-control" value="<?php echo $user ?>" readonly>
+                        <?php } else { ?>
+                            <input name="nom" type="text" placeholder="Votre nom" class="form-control">
+                        <?php } ?>
             
                         <label for="comment">Commentaire</label>
                         <textarea name="comment" id="" cols="30" rows="3" placeholder="Votre commentaire" class="form-control"></textarea>
